@@ -61,8 +61,8 @@ class Game {
         for (int i = 0; i < wrongLetters.length(); i++) {
             output.append(Character.toUpperCase(wrongLetters.charAt(i)));
 
-            if (i == wrongLetters.length()) {
-                output.append("."); // TODO: debug why output always ends with , and not .
+            if (i == wrongLetters.length()-1) {
+                output.append(".");
             } else {
                 output.append(", ");
             }
@@ -79,13 +79,13 @@ class Game {
         // Then replace every non-space, non-alphanumeric, non-underscore character with a single space,
         // which obfuscates punctuation without removing its traces completely.
         String sanitisedOutput = currentPhrase.
-                replace(" ", "   ").
+                replaceAll("[ ]", "   ").
                 replaceAll("[\\W\\S]", " ");
 
         // Then add a space after each underscore and revealed letter that isn't followed by space or end-of-line.
         Matcher matcher = Pattern.compile("[_\\w](?!\\b)").matcher(sanitisedOutput);
 
-        List<Character> outputChars = new ArrayList<>(); // TODO: convert this mess into a StringBuilder and debug.
+        List<Character> outputChars = new ArrayList<>(); // TODO: debug.
         for (char character: sanitisedOutput.toCharArray()) outputChars.add(character);
 
         while (matcher.find()) outputChars.add(matcher.start()+1, ' ');
@@ -191,7 +191,6 @@ class Game {
             phraseChars[index] = letter;
 
             // Look for the next instance of letter in the solution.
-            // TODO: check if letter in last index gives index bounds exception.
             index = solution.indexOf(letter, index+1);
         }
         // Convert back to String and update the current phrase.
