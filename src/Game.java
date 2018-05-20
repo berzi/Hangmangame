@@ -1,7 +1,5 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import exceptions.InvalidInputException;
+import exceptions.GameHasEndedException;
 
 /**
  * Control the flow of the game and manage the the game's solution and progress.
@@ -56,7 +54,7 @@ class Game {
      * @return all the letters that have been attempted but are not present in the solution, separated by commas.
      */
     String getWrongLetters() {
-        StringBuilder output = new StringBuilder();
+        var output = new StringBuilder();
 
         for (int i = 0; i < wrongLetters.length(); i++) {
             output.append(Character.toUpperCase(wrongLetters.charAt(i)));
@@ -78,38 +76,45 @@ class Game {
         // Replace every space between words with three spaces for clarity (see below).
         // Then replace every non-space, non-alphanumeric, non-underscore character with a single space,
         // which obfuscates punctuation without removing its traces completely.
-        String sanitisedOutput = currentPhrase.
-                replaceAll("[ ]", "   ").
-                replaceAll("[\\W\\S]", " ");
+        var sanitisedOutput = currentPhrase.
+                replaceAll(" ", "   ").
+                replaceAll("[^ _\\p{Alnum}]", " ");
 
         // Then add a space after each underscore and revealed letter that isn't followed by space or end-of-line.
-        Matcher matcher = Pattern.compile("[_\\w](?!\\b)").matcher(sanitisedOutput);
+        var builder = new StringBuilder();
+        for (int i = 0; i < sanitisedOutput.length(); i++) {
+            var currentChar = sanitisedOutput.charAt(i);
 
-        List<Character> outputChars = new ArrayList<>(); // TODO: debug.
-        for (char character: sanitisedOutput.toCharArray()) outputChars.add(character);
+            if (currentChar == '_' || Character.isLetterOrDigit(currentChar)) {
+                if (i + 1 == sanitisedOutput.length() || sanitisedOutput.charAt(i + 1) == ' ') {
+                    builder.append(currentChar);
+                } else {
+                    builder.append(currentChar).append(" ");
+                }
+            } else {
+                builder.append(currentChar);
+            }
+        }
 
-        while (matcher.find()) outputChars.add(matcher.start()+1, ' ');
-        sanitisedOutput = String.valueOf(outputChars);
-
-        return sanitisedOutput;
+        return builder.toString();
     }
 
     /**
      * Check if a letter is present in the solution.
-     * @param letter: the letter to be checked.
+     * @param letter the letter to be checked.
      * @return -1: if the letter has been attempted before.
      *          0: if the letter is not present in the solution and an error has been added.
      *          #: the number of matches inside the solution, if the letter has been found.
-     * @throws GameHasEnded if the game has already ended.
-     * @throws InvalidInput if letter is not alphanumeric.
+     * @throws GameHasEndedException if the game has already ended.
+     * @throws InvalidInputException if letter is not alphanumeric.
      */
-    int check(char letter) throws GameHasEnded, InvalidInput {
-        if (!isOn()) { throw new GameHasEnded(); }
+    int check(char letter) throws GameHasEndedException, InvalidInputException {
+        if (!isOn()) { throw new GameHasEndedException(); }
 
-        char guess = Character.toLowerCase(letter);
-        if (!Character.isLetterOrDigit(guess)) throw new InvalidInput();
+        var guess = Character.toLowerCase(letter);
+        if (!Character.isLetterOrDigit(guess)) throw new InvalidInputException();
 
-        int result = unmask(guess);
+        var result = unmask(guess);
 
         // Only count the guess if it wasn't a duplicate.
         if (result != -1) guessesMade += 1;
@@ -130,17 +135,15 @@ class Game {
         return false;
     }
 
-    boolean isOn() {
-        return isOn;
-    }
+    boolean isOn() { return isOn; }
 
 
     /**
      * Add one to the count of errors made by the player so far. End the game if the errorLimit has been reached.
-     * @throws GameHasEnded if the game has ended, preventing changes.
+     * @throws GameHasEndedException if the game has ended, preventing changes.
      */
-    private void addError() throws GameHasEnded {
-        if (!isOn()) { throw new GameHasEnded(); }
+    private void addError() throws GameHasEndedException {
+        if (!isOn()) { throw new GameHasEndedException(); }
 
         errors +=1;
 
@@ -165,9 +168,10 @@ class Game {
      * Unmask the entered letter if present in the solution.
      * @param letter the letter to be revealed.
      * @return the amount of matches found in the solution or -1 if the letter has been attempted before.
+     * @throws GameHasEndedException if the game has ended, preventing changes.
      */
-    private int unmask(char letter) throws GameHasEnded {
-        if (!isOn()) { throw new GameHasEnded(); }
+    private int unmask(char letter) throws GameHasEndedException {
+        if (!isOn()) { throw new GameHasEndedException(); }
 
         // If the letter is already present in the current phrase or the wrong letters, it's been guessed before.
         if (currentPhrase.indexOf(letter) != -1 || wrongLetters.indexOf(letter) != -1) return -1;
@@ -180,10 +184,10 @@ class Game {
             return 0;
         }
 
-        int found = 0;
+        var found = 0;
 
         // Convert to array so that we can modify the contents of the string.
-        char[] phraseChars = currentPhrase.toCharArray();
+        var phraseChars = currentPhrase.toCharArray();
         while (index != -1) {
             found += 1;
 
@@ -201,8 +205,4 @@ class Game {
 
         return found;
     }
-
-
-    class GameHasEnded extends Exception {}
-    class InvalidInput extends Exception {}
 }

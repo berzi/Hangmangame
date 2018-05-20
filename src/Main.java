@@ -1,8 +1,11 @@
-import java.io.FileNotFoundException;
+import exceptions.GameHasEndedException;
+import exceptions.InvalidInputException;
+
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
- * Given a list of film titles (or other words), provided in a file, one item per line,
+ * Given a list of phrases provided in a file, one item per line,
  * generate a Hangman game with a random item and allow the player to guess a letter at a time.
  */
 public class Main {
@@ -20,7 +23,7 @@ public class Main {
             // No arguments or default file: generate a phrasesFile from the default file.
             try {
                 phrasesFile = new PhrasesFile();
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 System.out.println("The default file films.txt was not found.");
                 System.out.println("Please make a new one or specify a different file.");
                 System.exit(1);
@@ -29,7 +32,7 @@ public class Main {
             // First argument is custom: attempt to generate a phrasesFile from the custom file.
             try {
                 phrasesFile = new PhrasesFile(args[0]);
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 System.out.println("The specified file was not found.");
                 System.out.println("Please double-check the path and name of the file.");
                 System.out.println("Alternatively, specify a different file or use the default one.");
@@ -67,9 +70,6 @@ public class Main {
             if (game.getGuessesMade() == 0) {
                 System.out.println("Make your first guess!");
             } else {
-                System.out.println();
-                System.out.println();
-
                 int errors = game.getErrors();
                 if (errors > 0) {
                     System.out.println("You have made " + errors + " out of " +
@@ -93,10 +93,10 @@ public class Main {
 
             int guessResult = -1;
             try { guessResult = game.check(guessedLetter); }
-            catch (Game.GameHasEnded gameHasEnded) {
+            catch (GameHasEndedException e) {
                 System.out.println("ERROR: the game has already ended! Bye!");
                 System.exit(0);
-            } catch (Game.InvalidInput invalidInput) {
+            } catch (InvalidInputException e) {
                 System.out.println("You can only enter a letter or number! Try again.");
                 continue;
             }
@@ -124,9 +124,11 @@ public class Main {
             System.out.println("Here's the solution:");
         } else {
             System.out.println(" )': Oh no! You ran out of tries, you lost! :'( ");
+            System.out.println();
             System.out.println("Better luck next time! This was the solution:");
         }
         System.out.println(game.getSolution());
+        System.out.println();
         System.out.println("Thanks for playing, goodbye! :*");
     }
 }
