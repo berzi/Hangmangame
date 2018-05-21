@@ -10,22 +10,22 @@ import java.util.List;
  * The file must have one entry per line.
  */
 class PhrasesFile {
-    private List<String> phrasesList = new ArrayList<>();
+    private List<String> phrasesList;
 
-
-    /**
-     * Initialise the PhrasesFile with the default list file.
-     */
-    PhrasesFile() throws IOException { this("films.txt"); }
 
     /**
      * Initialise the PhrasesFile with a specified list file.
-     * @param file_path the path to the custom list file.
+     * @param filePath the path to the custom list file.
      */
-    PhrasesFile(String file_path) throws IOException {
-        phrasesList = Files.readAllLines(Paths.get(file_path));
+    PhrasesFile(String filePath) throws IOException {
+        phrasesList = Files.readAllLines(Paths.get(filePath));
     }
 
+
+    /**
+     * @return the phrasesList.
+     */
+    List<String> getPhrasesList() { return phrasesList; }
 
     /**
      * Pick a phrase from the list of phrases.

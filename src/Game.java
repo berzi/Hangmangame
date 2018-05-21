@@ -23,20 +23,15 @@ class Game {
     private int guessesMade;
     private int errors;
 
-    Game(String solution) {
+    Game(String solution, int errorLimit) {
         this.solution = solution.toLowerCase().trim();
         currentPhrase = mask(solution);
 
         wrongLetters = "";
-        errorLimit = 10;
+        this.errorLimit = errorLimit;
         guessesMade = 0;
         errors = 0;
         isOn = true;
-    }
-
-    Game(String solution, int errorLimit) {
-        this(solution);
-        this.errorLimit = errorLimit;
     }
 
     /**
