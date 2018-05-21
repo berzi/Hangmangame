@@ -144,8 +144,8 @@ public class Main {
                     System.out.println("You have made " + errors + " out of " +
                             game.getErrorLimit() + " allowed errors.");
 
-                    String plural = errors == 1?"This letter has been tried and is":
-                            "These letters have been tried and are";
+                    String plural = errors != 1?"These letters have been tried and are":
+                            "This letter has been tried and is";
 
                     System.out.println(plural + " not present in the solution:");
                     System.out.println(game.getWrongLetters());
@@ -180,7 +180,7 @@ public class Main {
             } else if (guessResult == 0) {
                 System.out.println(guessedLetter + " is not present, sorry!");
             } else {
-                String plural = guessResult > 1?"s":"";
+                String plural = guessResult != 1?"s":"";
                 System.out.println("Yay! " + guessedLetter + " is present " +
                         guessResult + " time" + plural + "!");
             }
@@ -190,7 +190,7 @@ public class Main {
         System.out.println();
         if (game.isSolutionFound()) {
             int errors = game.getErrors();
-            String plural = errors>1?"s":"";
+            String plural = errors != 1?"s":"";
 
             System.out.println(" *** Hurray! You won! *** ");
             System.out.println("It took you " + game.getGuessesMade() + " guesses and you made " +
