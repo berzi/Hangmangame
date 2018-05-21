@@ -18,7 +18,10 @@ class PhrasesFile {
      * @param filePath the path to the custom list file.
      */
     PhrasesFile(String filePath) throws IOException {
-        phrasesList = Files.readAllLines(Paths.get(filePath));
+        List<String> fileEntries = Files.readAllLines(Paths.get(filePath));
+        for (String phrase:fileEntries) {
+            phrasesList.add(phrase.toLowerCase());
+        }
     }
 
 
